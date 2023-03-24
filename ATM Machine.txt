@@ -1,0 +1,716 @@
+title ATM Project
+include irvine16.inc
+
+.data
+str1 byte "Enter ID = ", 0
+str2 byte "Enter Your Password = ", 0
+str3 byte "Invalid Password!!!", 0
+str4 byte "Enter your choice = ", 0
+str5 byte "1. Check Status.", 0
+str6 byte "2. Transaction.", 0
+str7 byte "3. Transfer.", 0
+str8 byte "5. Exit.", 0
+str9 byte "Your Bank Balance = ", 0
+str10 byte "Money Withdrawn = ", 0
+str11 byte "Your Remaining Balance = ", 0
+str12 byte "Succesful Transaction!!!", 0
+str13 byte "Unuccesful!!! You are exceding available Amount.", 0
+str14 byte "Invalid ID!!!", 0
+str15 byte "Enter Choice = ", 0
+str16 byte "Invalid Choice!!!", 0
+str17 byte "Enter Amount = ", 0
+str18 byte "Succesful Transfer!!!", 0
+str19 byte "Your account is Empty!!!", 0
+str20 byte "4. Change Account.", 0
+n1 byte "Musab", 0
+n2 byte "Danial", 0
+n3 byte "Abdullah", 0
+n4 byte "Abdur-Rehman", 0
+var word ?
+
+user STRUCT
+    id word ?
+    money word ?
+    pin word ?
+user ENDS
+
+u1 user<>
+u2 user<>
+u3 user<>
+u4 user<>
+
+.code
+main proc
+mov ax, @data
+mov ds, ax
+
+
+mov u1.id, 123
+mov u1.money, 25000
+mov u1.pin, 8088
+mov u2.id, 234
+mov u2.money, 20000
+mov u2.pin, 8086
+mov u3.id, 345
+mov u3.money, 50000
+mov u3.pin, 7569
+mov u4.id, 456
+mov u4.money, 20001
+mov u4.pin, 4838
+
+INPUT:
+    mov dx, offset str1
+    call writestring
+    call readint
+    mov cx, ax
+
+
+ID1:
+    cmp ax, u1.id
+    je PASS1
+    jne ID2
+
+ID2:
+    cmp ax, u2.id
+    je PASS2
+    jne ID3
+
+ID3:
+    cmp ax, u3.id
+    je PASS3
+    jne ID4
+
+ID4:
+    cmp ax, u4.id
+    je PASS4
+    mov dx, offset str14
+    call writestring
+    call crlf
+    cmp ax, u4.id
+    jne INPUT                       
+
+
+PASS1:
+    mov dx, offset str2
+    call writestring
+    call readint
+    cmp ax, u1.pin
+    je MENU
+    mov dx, offset str3
+    call writestring
+    call crlf
+    cmp ax, u1.pin
+    jne PASS1
+
+PASS2:
+    mov dx, offset str2 
+    call writestring
+    call readint
+    cmp ax, u2.pin
+    je MENU
+    mov dx, offset str3
+    call writestring
+    call crlf
+    cmp ax, u2.pin
+    jne PASS2
+
+PASS3:
+    mov dx, offset str2
+    call writestring
+    call readint
+    cmp ax, u3.pin
+    je MENU
+    mov dx, offset str3
+    call writestring
+    call crlf
+    cmp ax, u3.pin
+    jne PASS3
+
+PASS4:
+    mov dx, offset str2
+    call writestring
+    call readint
+    cmp ax, u4.pin
+    je MENU
+    mov dx, offset str3
+    call writestring
+    call crlf
+    cmp ax, u4.pin
+    jne PASS4
+
+
+MENU:
+    mov dx, offset str5
+    call writestring
+    call crlf
+    mov dx, offset str6
+    call writestring
+    call crlf
+    mov dx, offset str7
+    call writestring
+    call crlf
+    mov dx, offset str20
+    call writestring
+    call crlf
+    mov dx, offset str8
+    call writestring
+    call crlf
+
+IDTRANSFERCHECKING:
+    cmp cx, u1.id
+    je U1Choice
+    cmp cx, u2.id
+    je U2Choice
+    cmp cx, u3.id
+    je U3Choice
+    cmp cx, u4.id
+    je U4Choice
+       
+
+
+U1Choice:  
+    mov dx, offset str15        ;"Enter Choice"
+    call writestring
+    call readint 
+    cmp ax, 1
+    je Status1
+    cmp ax, 2
+    je Transaction1
+    cmp ax, 3
+    je Transfer1
+    cmp ax, 4
+    je Input
+    cmp ax, 5
+    je Break
+    mov dx, offset str16        ;"Invalid Choice"
+    call writestring
+    cmp ax, 5
+    jne U1Choice
+
+Status1:
+    mov dx, offset str9
+    call writestring
+    mov ax, u1.money
+    call writedec
+    call crlf
+    jmp MENU
+    
+Trans1:
+  mov dx, offset str11
+    call writestring
+    sub u1.money, ax
+    mov ax, u1.money
+    call writedec
+    call crlf
+    mov dx, offset str12
+    call writestring
+    call crlf
+    jmp MENU
+
+Transaction1:
+    mov dx, offset str17
+    call writestring
+    call readint
+     mov bx, u1.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u1.money
+    jle Trans1
+    mov dx, offset str13
+    call writestring
+    call crlf
+    jmp MENU
+    
+
+ErrorTransfer:
+    mov dx, offset str13
+    call writestring
+    call crlf
+    jmp MENU
+
+
+Empty:
+    mov dx, offset str19
+    call writestring
+    call crlf
+    jmp MENU    
+    
+Transfer1:
+    mov dx, offset str1         ;Enter ID
+    call writestring
+    call readint
+
+U1TID2:
+    cmp ax, u2.id
+    je U1Mtrans2
+    jne U1TID3
+
+U1TID3:
+    cmp ax, u3.id
+    je U1Mtrans3
+    jne U1TID4
+
+U1TID4:
+    cmp ax, u4.id
+    je U1Mtrans4
+    mov dx, offset str14
+    call writestring
+    call crlf
+    cmp ax, u4.id
+    jne Transfer1
+
+U1Mtrans2:
+    mov dx, offset str17        ;Enter Amount
+    call writestring
+    call readint
+    mov var, ax
+    mov bx, u1.money
+    cmp bx, 0
+    je Empty
+    mov ax, var
+    cmp ax, u1.money
+    jg ErrorTransfer
+    sub u1.money, ax
+    add u2.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+       
+U1Mtrans3:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov var, ax
+    mov bx, u1.money
+    cmp bx, 0
+    je Empty
+    mov ax, var
+    cmp ax, u1.money
+    jg ErrorTransfer
+    sub u1.money, ax
+    add u3.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+U1Mtrans4:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov var, ax
+    mov bx, u1.money
+    cmp bx, 0
+    je Empty
+    mov ax, var
+    cmp ax, u1.money
+    jg ErrorTransfer
+    sub u1.money, ax
+    add u4.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU    
+
+
+
+
+
+; User 2
+
+U2Choice:
+    mov dx, offset str15        ;"Enter Choice"
+    call writestring
+    call readint 
+    cmp ax, 1
+    je U2Status
+    cmp ax, 2
+    je U2Transaction
+    cmp ax, 3
+    je U2Transfer
+    cmp ax, 4
+    je Input
+    cmp ax, 5
+    je Break
+    mov dx, offset str16        ;"Invalid Choice"
+    call writestring
+    cmp ax, 5
+    jne U2Choice
+
+
+U2Status:
+    mov dx, offset str9
+    call writestring
+    mov ax, u2.money
+    call writedec
+    call crlf
+    jmp MENU
+
+U2Trans:
+    mov dx, offset str11
+    call writestring
+    sub u2.money, ax
+    mov ax, u2.money
+    call writedec
+    call crlf
+    mov dx, offset str12
+    call writestring
+    call crlf
+    jmp MENU   
+
+U2Transaction:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u2.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u2.money
+    jle U2Trans
+   mov dx, offset str13
+    call writestring
+    call crlf
+    jmp MENU
+
+U2Transfer:
+    mov dx, offset str1         ;Enter ID
+    call writestring
+    call readint
+
+U2TID1:
+    cmp ax, u1.id
+    je U2Mtrans1
+    jne U2TID3
+
+U2TID3:
+    cmp ax, u3.id
+    je U2Mtrans3
+    jne U2TID4
+
+U2TID4:
+    cmp ax, u4.id
+    je U2Mtrans4
+    mov dx, offset str14
+    call writestring
+    call crlf
+    cmp ax, u4.id
+    jne U2Transfer
+
+U2Mtrans1:
+    mov dx, offset str17        ;Enter Amount
+    call writestring
+    call readint
+    mov bx, u2.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u2.money
+    jg ErrorTransfer
+    sub u2.money, ax
+    add u1.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+       
+U2Mtrans3:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u2.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u2.money
+    jg ErrorTransfer
+    sub u2.money, ax
+    add u3.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+U2Mtrans4:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u2.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u2.money
+    jg ErrorTransfer
+    sub u2.money, ax
+    add u4.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU    
+
+
+
+
+
+;User 3
+
+U3Choice:
+    mov dx, offset str15        ;"Enter Choice"
+    call writestring
+    call readint 
+    cmp ax, 1
+    je U3Status
+    cmp ax, 2
+    je U3Transaction
+    cmp ax, 3
+    je U3Transfer
+    cmp ax, 4
+    je Input
+    cmp ax, 5
+    je Break
+    mov dx, offset str16        ;"Invalid Choice"
+    call writestring
+    cmp ax, 5
+    jne U3Choice
+
+
+U3Status:
+    mov dx, offset str9
+    call writestring
+    mov ax, u3.money
+    call writedec
+    call crlf
+    jmp MENU
+
+U3Trans:
+  mov dx, offset str11
+    call writestring
+    sub u3.money, ax
+    mov ax, u3.money
+    call writedec
+    call crlf
+    mov dx, offset str12
+    call writestring
+    call crlf
+    jmp MENU  
+
+U3Transaction:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u3.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u3.money
+    jle U3Trans
+    mov dx, offset str13
+    call writestring
+    call crlf
+    jmp MENU
+
+U3Transfer:
+    mov dx, offset str1         ;Enter ID
+    call writestring
+    call readint
+
+U3TID1:
+    cmp ax, u1.id
+    je U3Mtrans1
+    jne U3TID2
+
+U3TID2:
+    cmp ax, u2.id
+    je U3Mtrans2
+    jne U3TID4
+
+U3TID4:
+    cmp ax, u4.id
+    je U3Mtrans4
+    mov dx, offset str14
+    call writestring
+    call crlf
+    cmp ax, u4.id
+    jne U3Transfer
+
+U3Mtrans1:
+    mov dx, offset str17        ;Enter Amount
+    call writestring
+    call readint
+    mov bx, u3.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u3.money
+    jg ErrorTransfer
+    sub u3.money, ax
+    add u1.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+U3Mtrans2:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u3.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u3.money
+    jg ErrorTransfer
+    sub u3.money, ax
+    add u2.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+U3Mtrans4:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u3.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u3.money
+    jg ErrorTransfer
+    sub u3.money, ax
+    add u4.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+
+
+
+;User 4
+
+U4Choice:
+    mov dx, offset str15        ;"Enter Choice"
+    call writestring
+    call readint 
+    cmp ax, 1
+    je U4Status
+    cmp ax, 2
+    je U4Transaction
+    cmp ax, 3
+    je U4Transfer
+    cmp ax, 4
+    je Input
+    cmp ax, 5
+    je Break
+    mov dx, offset str16        ;"Invalid Choice"
+    call writestring
+    cmp ax, 5
+    jne U4Choice
+
+
+U4Status:
+    mov dx, offset str9
+    call writestring
+    mov ax, u4.money
+    call writedec
+    call crlf
+    jmp MENU
+
+U4Trans:
+   mov dx, offset str11
+    call writestring
+    sub u4.money, ax
+    mov ax, u4.money
+    call writedec
+    call crlf
+    mov dx, offset str12
+    call writestring
+    call crlf
+    jmp MENU   
+
+
+U4Transaction:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u4.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u4.money
+    jle U4Trans
+    mov dx, offset str13
+    call writestring
+    call crlf
+    jmp MENU
+
+U4Transfer:
+    mov dx, offset str1         ;Enter ID
+    call writestring
+    call readint
+
+U4TID1:
+    cmp ax, u1.id
+    je U4Mtrans1
+    jne U4TID2
+
+U4TID2:
+    cmp ax, u2.id
+    je U4Mtrans2
+    jne U4TID3
+
+U4TID3:
+    cmp ax, u3.id
+    je U4Mtrans3
+    mov dx, offset str14
+    call writestring
+    call crlf
+    cmp ax, u3.id
+    jne U4Transfer
+
+U4Mtrans1:
+    mov dx, offset str17        ;Enter Amount
+    call writestring
+    call readint
+    mov bx, u4.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u4.money
+    jg ErrorTransfer
+    sub u4.money, ax
+    add u1.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+U4Mtrans2:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u4.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u4.money
+    jg ErrorTransfer
+    sub u4.money, ax
+    add u2.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+U4Mtrans3:
+    mov dx, offset str17
+    call writestring
+    call readint
+    mov bx, u4.money
+    cmp bx, 0
+    je Empty
+    cmp ax, u4.money
+    jg ErrorTransfer
+    sub u4.money, ax
+    add u3.money, ax
+    mov dx, offset str18
+    call writestring
+    call crlf
+    jmp MENU
+
+Break:
+
+exit
+main endp
+end main
